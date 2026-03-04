@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mahjong AI - Advanced Strategy Calculator</title>
+  <title>Mahjong AI</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,32 +16,21 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    /* Modern animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(30px); }
-      to { opacity: 1; transform: translateX(0); }
+    @keyframes slideIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
     }
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-30px); }
-      to { opacity: 1; transform: translateX(0); }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes pulseGlow {
-      0%, 100% { 
-        transform: scale(1); 
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-      }
-      50% { 
-        transform: scale(1.02); 
-        box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
-      }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -52,310 +41,187 @@
       0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
-    /* Animation classes */
-    .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
-    .slide-in-right { animation: slideInRight 0.5s ease-out forwards; }
-    .slide-in-left { animation: slideInLeft 0.5s ease-out forwards; }
-    .scale-in { animation: scaleIn 0.4s ease-out forwards; }
-    .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
-    .float { animation: float 6s ease-in-out infinite; }
-
-    /* Modern glass morphism */
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease forwards;
     }
-
-    .glass-card {
-      background: rgba(30, 41, 59, 0.8);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      box-shadow: 
-        0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    .slide-in {
+      animation: slideIn 0.3s ease forwards;
     }
-
-    /* Enhanced tile styles */
-    .mahjong-tile {
+    .pulse-glow {
+      animation: pulse 2s infinite, glow 2s infinite;
+    }
+    .tile-hover {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      background: linear-gradient(135deg, var(--tile-bg-start), var(--tile-bg-end));
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06),
-        inset 0 1px 2px rgba(255, 255, 255, 0.1);
     }
-    
-    .mahjong-tile:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 
-        0 10px 25px -5px rgba(0, 0, 0, 0.25),
-        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    .tile-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
-
-    .mahjong-tile:active {
-      transform: translateY(0) scale(0.98);
+    .tile-hover:active {
+      transform: translateY(0px);
       transition: all 0.1s;
     }
-
-    .mahjong-tile::before {
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    .gradient-border {
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981);
+      background-size: 400% 400%;
+      animation: gradientShift 3s ease infinite;
+    }
+    .shimmer::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 2s infinite;
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-
-    .mahjong-tile:hover::before {
-      transform: translateX(100%);
+    .tile-hover:hover .shimmer::before {
+      opacity: 1;
     }
-
-    /* Tile size variants */
+    
+    /* Compact tiles for laptop efficiency */
     .tile-compact {
-      width: 52px;
-      height: 66px;
-      min-width: 52px;
-      min-height: 66px;
+      width: 44px;
+      height: 56px;
+      min-width: 44px;
+      min-height: 56px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
     }
     
-    .tile-standard {
-      width: 56px;
-      height: 72px;
-      min-width: 56px;
-      min-height: 72px;
+    .tile-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      justify-content: center;
+      max-width: 100%;
+    }
+    
+    .hand-tile {
+      width: 48px;
+      height: 60px;
+      min-width: 48px;
+      min-height: 60px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
     }
-
-    /* Dashboard layout */
-    .dashboard-grid {
+    
+    /* Two-column layout for laptops */
+    .laptop-layout {
       display: grid;
-      grid-template-columns: 400px 1fr 320px;
-      grid-template-rows: auto 1fr;
-      grid-template-areas: 
-        "header header header"
-        "tiles game-area stats";
-      gap: 1.5rem;
-      height: 100vh;
-      max-height: 100vh;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      align-items: start;
     }
-
-    .header-area { grid-area: header; }
-    .tiles-area { grid-area: tiles; }
-    .game-area { grid-area: game-area; }
-    .stats-area { grid-area: stats; }
-
-    @media (max-width: 1400px) {
-      .dashboard-grid {
-        grid-template-columns: 350px 1fr 280px;
-      }
-    }
-
-    @media (max-width: 1200px) {
-      .dashboard-grid {
+    
+    @media (max-width: 1280px) {
+      .laptop-layout {
         grid-template-columns: 1fr;
-        grid-template-areas: 
-          "header"
-          "game-area"
-          "tiles"
-          "stats";
-        height: auto;
-        max-height: none;
       }
     }
-
-    /* Scrollbar styling */
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+    
+    /* Compact sections */
+    .compact-section {
+      padding: 1rem;
     }
-
-    .custom-scrollbar::-webkit-scrollbar {
+    
+    .compact-tile-section {
+      padding: 0.75rem;
+    }
+    
+    /* Reduced spacing for efficiency */
+    .compact-grid {
+      gap: 0.5rem;
+    }
+    
+    /* Scrollable tile selection area */
+    .tile-selection-scroll {
+      max-height: 70vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+    }
+    
+    .tile-selection-scroll::-webkit-scrollbar {
       width: 6px;
     }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
+    
+    .tile-selection-scroll::-webkit-scrollbar-track {
       background: transparent;
     }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: rgba(148, 163, 184, 0.3);
-      border-radius: 3px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background-color: rgba(148, 163, 184, 0.5);
-    }
-
-    /* Status indicator */
-    .status-indicator {
-      position: relative;
-    }
-
-    .status-indicator::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--indicator-color);
-      box-shadow: 0 0 6px var(--indicator-color);
-    }
-
-    /* Gradient backgrounds */
-    .bg-gradient-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
     
-    .bg-gradient-secondary {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .bg-gradient-accent {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
-    /* Button variants */
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-      box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
-    }
-
-    .btn-secondary:hover {
-      box-shadow: 0 6px 20px rgba(250, 112, 154, 0.6);
-      transform: translateY(-1px);
-    }
-
-    .btn-accent {
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-      color: #1f2937;
-      box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
-    }
-
-    .btn-accent:hover {
-      box-shadow: 0 6px 20px rgba(168, 237, 234, 0.6);
-      transform: translateY(-1px);
+    .tile-selection-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(75, 85, 99, 0.5);
+      border-radius: 3px;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 min-h-screen font-sans overflow-hidden">
-  <!-- Animated background -->
+<body class="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 min-h-screen font-sans overflow-x-hidden">
+  <!-- Animated background elements -->
   <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full filter blur-3xl float"></div>
-    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full filter blur-3xl float" style="animation-delay: -2s;"></div>
-    <div class="absolute top-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-full filter blur-3xl float" style="animation-delay: -4s;"></div>
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full filter blur-3xl animate-pulse"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-full filter blur-3xl"></div>
   </div>
 
-  <!-- Loading screen -->
   <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
     <div class="text-center">
-      <div class="relative w-32 h-32 mb-8 mx-auto">
-        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 animate-spin opacity-20" style="border: 8px solid transparent; border-top-color: currentColor;"></div>
-        <div class="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 animate-spin opacity-40" style="border: 6px solid transparent; border-top-color: currentColor; animation-duration: 1.5s; animation-direction: reverse;"></div>
-        <div class="absolute inset-0 flex items-center justify-center">
-          <span class="text-5xl animate-pulse">🀄</span>
+      <div class="relative w-24 h-24 mb-6 mx-auto">
+        <div class="absolute top-0 left-0 w-full h-full rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 animate-spin opacity-75" style="border-radius: 50%; border: 6px solid transparent; border-top-color: currentColor; animation: spin 1s linear infinite;"></div>
+        <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+          <span class="text-4xl">🀄</span>
         </div>
       </div>
-      <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 mb-2">
-        Mahjong AI
-      </h2>
-      <p class="text-gray-400">Initializing advanced strategy engine...</p>
+      <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">Loading Mahjong AI</h2>
+      <p class="text-gray-400 mt-2">Preparing tiles...</p>
     </div>
   </div>
 
   <div id="root"></div>
 
   <script type="text/babel">
-    // Enhanced loading screen
+    // Hide loading screen when app is ready
     window.addEventListener('load', () => {
       setTimeout(() => {
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
           loadingScreen.style.opacity = '0';
-          loadingScreen.style.transition = 'opacity 0.8s ease-out';
+          loadingScreen.style.transition = 'opacity 0.5s ease-out';
           setTimeout(() => {
             loadingScreen.style.display = 'none';
-          }, 800);
+          }, 500);
         }
-      }, 2000);
+      }, 1500); // Show loading for at least 1.5s for better UX
     });
-
     const tileTypes = {
-      man: { 
-        color: "from-red-500 to-red-700", 
-        shadow: "shadow-red-500/25", 
-        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
-        name: "Characters",
-        emoji: "🀇"
-      },
-      pin: { 
-        color: "from-amber-500 to-orange-600", 
-        shadow: "shadow-amber-500/25", 
-        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
-        name: "Dots",
-        emoji: "🀙"
-      },
-      sou: { 
-        color: "from-emerald-500 to-green-700", 
-        shadow: "shadow-emerald-500/25", 
-        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
-        name: "Bamboo",
-        emoji: "🀐"
-      },
-      wind: { 
-        color: "from-violet-500 to-purple-700", 
-        shadow: "shadow-violet-500/25", 
-        tiles: ["東", "南", "西", "北"], 
-        name: "Winds",
-        emoji: "🀀"
-      },
-      dragon: { 
-        color: "from-cyan-500 to-blue-700", 
-        shadow: "shadow-cyan-500/25", 
-        tiles: ["中", "發", "白"], 
-        name: "Dragons",
-        emoji: "🀄"
-      },
+      man: { color: "bg-gradient-to-br from-red-500 to-red-700 text-white shadow-red-500/25", tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], name: "Characters" },
+      pin: { color: "bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-amber-500/25", tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], name: "Dots" },
+      sou: { color: "bg-gradient-to-br from-emerald-500 to-green-700 text-white shadow-emerald-500/25", tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], name: "Bamboo" },
+      wind: { color: "bg-gradient-to-br from-violet-500 to-purple-700 text-white shadow-violet-500/25", tiles: ["東", "南", "西", "北"], name: "Winds" },
+      dragon: { color: "bg-gradient-to-br from-cyan-500 to-blue-700 text-white shadow-cyan-500/25", tiles: ["中", "發", "白"], name: "Dragons" },
     };
 
     const tileToString = (tile) => {
@@ -371,7 +237,9 @@
         return mapping[tile.value];
       }
       return "";
-    };    const tileIndices = (() => {
+    };
+
+    const tileIndices = (() => {
       const suits = ['Characters', 'Dots', 'Bamboo'];
       const honors = ['East', 'South', 'West', 'North', 'White', 'Green', 'Red'];
       const idx = {};
@@ -472,8 +340,13 @@
       const [discardPile, setDiscardPile] = React.useState([]);
       const [discardMode, setDiscardMode] = React.useState(false);
       const [showModal, setShowModal] = React.useState(false);
+      const [showTips, setShowTips] = React.useState(false);
+
+      const [collapsedSections, setCollapsedSections] = React.useState({
+        tips: true,
+        modal: false
+      });
       const [handAnimation, setHandAnimation] = React.useState('');
-      const [activeSection, setActiveSection] = React.useState('tiles');
       
       // Keyboard shortcuts
       React.useEffect(() => {
@@ -489,14 +362,11 @@
           } else if (e.key === 'd' && e.ctrlKey) {
             e.preventDefault();
             handleAIDiscard();
-          } else if (e.key >= '1' && e.key <= '5') {
-            const sections = ['tiles', 'hand', 'discard', 'stats', 'help'];
-            setActiveSection(sections[parseInt(e.key) - 1]);
           }
         };
         window.addEventListener('keydown', handleKeyboard);
         return () => window.removeEventListener('keydown', handleKeyboard);
-      }, []);
+      }, [hand, recommendedDiscard, isStandardHandSize]);
       
       // Sorting function for tiles
       const getTileSortValue = (tile) => {
@@ -538,12 +408,9 @@
         
         if (countTile(type, value) >= 4) return;
         if (hand.length >= 14) return;
-        
-        const newTile = { type, value };
-        const newHand = getSortedHand([...hand, newTile]);
-        setHand(newHand);
-        setHandAnimation('scale-in');
-        setTimeout(() => setHandAnimation(''), 400);
+        setHand([...hand, { type, value }]);
+        setHandAnimation('slide-in');
+        setTimeout(() => setHandAnimation(''), 300);
       };
       
       const addToDiscardPile = (type, value) => {
@@ -558,7 +425,10 @@
         const removed = newHand.splice(index, 1)[0];
         setHand(newHand);
         
+        // Always add to discard pile when removing from hand,
+        // regardless of standard hand size
         if (removed) {
+          // Force adding to discard pile even for standard hand sizes
           setDiscardPile([...discardPile, { type: removed.type, value: removed.value }]);
         }
       };
@@ -574,8 +444,224 @@
       const resetGame = () => {
         setHand([]);
         setDiscardPile([]);
-        setHandAnimation('fade-in-up');
-        setTimeout(() => setHandAnimation(''), 600);
+      };
+
+      // Check if a tile can form a valid pung (triplet) with hand
+      const canFormPung = (tile) => {
+        const count = hand.filter(handTile => 
+          handTile.type === tile.type && handTile.value === tile.value
+        ).length;
+        return count >= 2;
+      };
+
+      // Check if a tile can form a valid chi (sequence) with hand  
+      const canFormChi = (tile) => {
+        // Chi only works with number suits (man, pin, sou)
+        if (!['man', 'pin', 'sou'].includes(tile.type)) return false;
+        
+        const value = parseInt(tile.value);
+        
+        // Check for sequences: ABC, BAC, CAB patterns
+        const patterns = [
+          [value - 2, value - 1], // tile completes ABC (tile is C)
+          [value - 1, value + 1], // tile completes BAC (tile is A) 
+          [value + 1, value + 2]  // tile completes CAB (tile is A)
+        ];
+        
+        for (const [v1, v2] of patterns) {
+          if (v1 >= 1 && v1 <= 9 && v2 >= 1 && v2 <= 9) {
+            const hasV1 = hand.some(handTile => 
+              handTile.type === tile.type && handTile.value === v1.toString()
+            );
+            const hasV2 = hand.some(handTile => 
+              handTile.type === tile.type && handTile.value === v2.toString()
+            );
+            
+            if (hasV1 && hasV2) return true;
+          }
+        }
+        return false;
+      };
+
+      // Simulate taking a meld and return the best resulting hand
+      const simulateMeld = (discardedTile) => {
+        let bestHand = null;
+        let bestShanten = Infinity;
+        let bestImprovingTiles = 0;
+        let meldType = null;
+
+        // Try pung if possible
+        if (canFormPung(discardedTile)) {
+          const handWithDiscard = [...hand, discardedTile];
+          // Remove 2 matching tiles from hand to form pung
+          const tempHand = [...handWithDiscard];
+          let removed = 0;
+          for (let i = tempHand.length - 1; i >= 0 && removed < 2; i--) {
+            if (tempHand[i].type === discardedTile.type && 
+                tempHand[i].value === discardedTile.value) {
+              tempHand.splice(i, 1);
+              removed++;
+            }
+          }
+          
+          if (tempHand.length > 0) {
+            // Find best discard from remaining tiles
+            let bestDiscardIndex = 0;
+            let bestResultShanten = Infinity;
+            let bestResultImproving = 0;
+            
+            for (let i = 0; i < tempHand.length; i++) {
+              const testHand = [...tempHand];
+              testHand.splice(i, 1);
+              const testShanten = shantenCount(testHand);
+              
+              if (testShanten < bestResultShanten) {
+                bestResultShanten = testShanten;
+                bestDiscardIndex = i;
+                bestResultImproving = countImprovingTilesAfterDiscard(tempHand, i, testShanten);
+              } else if (testShanten === bestResultShanten) {
+                const improving = countImprovingTilesAfterDiscard(tempHand, i, testShanten);
+                if (improving > bestResultImproving) {
+                  bestResultImproving = improving;
+                  bestDiscardIndex = i;
+                }
+              }
+            }
+            
+            const finalHand = [...tempHand];
+            finalHand.splice(bestDiscardIndex, 1);
+            
+            if (bestResultShanten < bestShanten || 
+                (bestResultShanten === bestShanten && bestResultImproving > bestImprovingTiles)) {
+              bestHand = finalHand;
+              bestShanten = bestResultShanten;
+              bestImprovingTiles = bestResultImproving;
+              meldType = 'pung';
+            }
+          }
+        }
+
+        // Try chi if possible
+        if (canFormChi(discardedTile)) {
+          const handWithDiscard = [...hand, discardedTile];
+          const value = parseInt(discardedTile.value);
+          
+          // Try all possible chi patterns
+          const patterns = [
+            [value - 2, value - 1], // ABC pattern
+            [value - 1, value + 1], // BAC pattern  
+            [value + 1, value + 2]  // CAB pattern
+          ];
+          
+          for (const [v1, v2] of patterns) {
+            if (v1 >= 1 && v1 <= 9 && v2 >= 1 && v2 <= 9) {
+              const tempHand = [...handWithDiscard];
+              let removedV1 = false, removedV2 = false;
+              
+              // Remove the two tiles needed for chi
+              for (let i = tempHand.length - 1; i >= 0; i--) {
+                if (!removedV1 && tempHand[i].type === discardedTile.type && 
+                    tempHand[i].value === v1.toString()) {
+                  tempHand.splice(i, 1);
+                  removedV1 = true;
+                } else if (!removedV2 && tempHand[i].type === discardedTile.type && 
+                          tempHand[i].value === v2.toString()) {
+                  tempHand.splice(i, 1);
+                  removedV2 = true;
+                }
+              }
+              
+              if (removedV1 && removedV2 && tempHand.length > 0) {
+                // Find best discard from remaining tiles
+                let bestDiscardIndex = 0;
+                let bestResultShanten = Infinity;
+                let bestResultImproving = 0;
+                
+                for (let i = 0; i < tempHand.length; i++) {
+                  const testHand = [...tempHand];
+                  testHand.splice(i, 1);
+                  const testShanten = shantenCount(testHand);
+                  
+                  if (testShanten < bestResultShanten) {
+                    bestResultShanten = testShanten;
+                    bestDiscardIndex = i;
+                    bestResultImproving = countImprovingTilesAfterDiscard(tempHand, i, testShanten);
+                  } else if (testShanten === bestResultShanten) {
+                    const improving = countImprovingTilesAfterDiscard(tempHand, i, testShanten);
+                    if (improving > bestResultImproving) {
+                      bestResultImproving = improving;
+                      bestDiscardIndex = i;
+                    }
+                  }
+                }
+                
+                const finalHand = [...tempHand];
+                finalHand.splice(bestDiscardIndex, 1);
+                
+                if (bestResultShanten < bestShanten || 
+                    (bestResultShanten === bestShanten && bestResultImproving > bestImprovingTiles)) {
+                  bestHand = finalHand;
+                  bestShanten = bestResultShanten;
+                  bestImprovingTiles = bestResultImproving;
+                  meldType = 'chi';
+                }
+              }
+            }
+          }
+        }
+
+        return {
+          hand: bestHand,
+          shanten: bestShanten,
+          improvingTiles: bestImprovingTiles,
+          meldType: meldType
+        };
+      };
+
+      // Evaluate whether to take the meld
+      const evaluateMeld = () => {
+        if (discardPile.length === 0 || hand.length === 0) return null;
+        
+        const lastTile = discardPile[discardPile.length - 1];
+        const currentShanten = shantenCount(hand);
+        const currentImproving = getCurrentImprovingTiles(hand);
+        
+        // Check if any meld is possible
+        if (!canFormPung(lastTile) && !canFormChi(lastTile)) {
+          return { action: 'Cannot Meld', reason: 'No valid meld possible', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-500/40' };
+        }
+        
+        const meldResult = simulateMeld(lastTile);
+        
+        if (!meldResult.hand) {
+          return { action: 'Cannot Meld', reason: 'No valid meld possible', color: 'text-blue-400', bg: 'bg-blue-900/20', border: 'border-blue-500/40' };
+        }
+        
+        // Compare scenarios
+        if (meldResult.shanten < currentShanten) {
+          return { action: 'Take Meld', reason: 'Reduces shanten', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-500/40' };
+        } else if (meldResult.shanten === currentShanten) {
+          if (meldResult.improvingTiles > currentImproving) {
+            return { action: 'Take Meld', reason: 'More improving tiles', color: 'text-green-400', bg: 'bg-green-900/20', border: 'border-green-500/40' };
+          } else {
+            return { action: 'Pass Meld', reason: 'No improvement in tiles', color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-500/40' };
+          }
+        } else {
+          return { action: 'Pass Meld', reason: 'Increases shanten', color: 'text-amber-400', bg: 'bg-amber-900/20', border: 'border-amber-500/40' };
+        }
+      };
+
+      // Generate a random tile that respects the 4-tile limit
+      const generateRandomTile = () => {
+        const allTiles = generateAllTiles();
+        const availableTiles = allTiles.filter(tile => {
+          return countSpecificTile(tile.type, tile.value) < 4;
+        });
+        
+        if (availableTiles.length === 0) return null;
+        
+        const randomIndex = Math.floor(Math.random() * availableTiles.length);
+        return availableTiles[randomIndex];
       };
 
       // Sort hand tiles using the same logic as discard pile
@@ -604,20 +690,8 @@
           newHand.push(availableTiles[randomIndex]);
         }
         
+        // Sort the hand by suit and value
         return getSortedHand(newHand);
-      };
-
-      // Generate a random tile that respects the 4-tile limit
-      const generateRandomTile = () => {
-        const allTiles = generateAllTiles();
-        const availableTiles = allTiles.filter(tile => {
-          return countSpecificTile(tile.type, tile.value) < 4;
-        });
-        
-        if (availableTiles.length === 0) return null;
-        
-        const randomIndex = Math.floor(Math.random() * availableTiles.length);
-        return availableTiles[randomIndex];
       };
 
       // AI recommended discard handler
@@ -630,21 +704,25 @@
       // Handle new hand/new tile button click
       const handleNewHandOrTile = () => {
         if (hand.length === 0) {
+          // Generate new random hand
           const newHand = generateRandomHand();
           setHand(newHand);
-          setHandAnimation('slide-in-right');
-          setTimeout(() => setHandAnimation(''), 500);
+          setHandAnimation('slide-in');
+          setTimeout(() => setHandAnimation(''), 300);
         } else if (hand.length === 14 && recommendedDiscard) {
+          // If there are 14 tiles in hand, perform the AI recommended discard
           removeFromHand(recommendedDiscard.index);
         } else {
+          // Generate new random tile
           if (hand.length >= 14) return;
           
           const newTile = generateRandomTile();
           if (newTile) {
+            // Add new tile and sort
             const newHand = getSortedHand([...hand, newTile]);
             setHand(newHand);
-            setHandAnimation('scale-in');
-            setTimeout(() => setHandAnimation(''), 400);
+            setHandAnimation('slide-in');
+            setTimeout(() => setHandAnimation(''), 300);
           }
         }
       };
@@ -674,6 +752,30 @@
         const maxPerTile = 4;
         const inPlay = countSpecificTile(type, value);
         return Math.max(0, maxPerTile - inPlay);
+      };
+
+      // Get current improving tiles for a hand (for meld evaluation)
+      const getCurrentImprovingTiles = (currentHand) => {
+        const allTiles = generateAllTiles();
+        const currentShanten = shantenCount(currentHand);
+        let improvingTiles = new Set();
+        let totalImprovingTiles = 0;
+
+        for (let tile of allTiles) {
+          const newHand = [...currentHand, tile];
+          const newShanten = shantenCount(newHand);
+          
+          if (newShanten < currentShanten) {
+            const tileKey = `${tile.type}:${tile.value}`;
+            if (!improvingTiles.has(tileKey)) {
+              improvingTiles.add(tileKey);
+              const remaining = getRemainingTileCount(tile.type, tile.value);
+              totalImprovingTiles += remaining;
+            }
+          }
+        }
+
+        return totalImprovingTiles;
       };
 
       function countImprovingTilesAfterDiscard(originalHand, discardIndex, baseShanten = null) {
@@ -744,583 +846,385 @@
       }, [hand, shanten]);
 
       const getShantenStatus = () => {
-        if (shanten === -1) return { 
-          text: "Winning Hand!", 
-          color: "text-emerald-400", 
-          bg: "from-emerald-500/20 to-green-500/20",
-          border: "border-emerald-400/50",
-          indicator: "#10b981"
-        };
-        if (shanten === 0) return { 
-          text: "Ready (Tenpai)", 
-          color: "text-amber-400", 
-          bg: "from-amber-500/20 to-yellow-500/20",
-          border: "border-amber-400/50",
-          indicator: "#f59e0b"
-        };
-        if (shanten <= 2) return { 
-          text: `${shanten} away`, 
-          color: "text-orange-400", 
-          bg: "from-orange-500/20 to-red-500/20",
-          border: "border-orange-400/50",
-          indicator: "#f97316"
-        };
-        return { 
-          text: `${shanten} away`, 
-          color: "text-red-400", 
-          bg: "from-red-500/20 to-pink-500/20",
-          border: "border-red-400/50",
-          indicator: "#ef4444"
-        };
+        if (shanten === -1) return { text: "Winning Hand!", color: "text-emerald-400", bg: "bg-emerald-900/20 border-emerald-500/30" };
+        if (shanten === 0) return { text: "Ready (Tenpai)", color: "text-amber-400", bg: "bg-amber-900/20 border-amber-500/30" };
+        if (shanten <= 2) return { text: `${shanten} away`, color: "text-orange-400", bg: "bg-orange-900/20 border-orange-500/30" };
+        return { text: `${shanten} away`, color: "text-red-400", bg: "bg-red-900/20 border-red-500/30" };
       };
 
-      const shantenStatus = getShantenStatus();      return (
-        <div className="dashboard-grid p-6 text-white">
-          {/* Header */}
-          <header className="header-area glass-panel rounded-2xl p-6 fade-in-up">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center text-2xl">
-                  🀄
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    Mahjong AI
-                  </h1>
-                  <p className="text-slate-400 text-sm">Advanced Strategy Calculator</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-400">{hand.length}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Hand Size</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-400">{discardPile.length}</div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Discarded</div>
-                  </div>
-                  <div className={`text-center status-indicator`} style={{'--indicator-color': shantenStatus.indicator}}>
-                    <div className={`text-2xl font-bold ${shantenStatus.color}`}>
-                      {shanten === -1 ? '🏆' : shanten}
-                    </div>
-                    <div className="text-xs text-slate-400 uppercase tracking-wide">Shanten</div>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={() => setShowModal(true)}
-                  className="btn-primary text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300"
-                >
-                  Help & Info
-                </button>
-              </div>
-            </div>
-          </header>
+      const shantenStatus = getShantenStatus();
 
-          {/* Tile Selection Panel */}
-          <aside className="tiles-area glass-panel rounded-2xl p-6 overflow-hidden slide-in-left">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-200">Tile Selection</h2>
-              <div className="flex items-center space-x-3">
-                <span className="text-sm text-slate-400">Add to Hand</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer" 
-                    checked={discardMode}
-                    onChange={() => setDiscardMode(!discardMode)}
-                  />
-                  <div className={`w-11 h-6 bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all ${discardMode ? 'bg-gradient-to-r from-purple-500 to-pink-500' : ''}`}></div>
-                </label>
-                <span className="text-sm text-slate-400">Discard</span>
-              </div>
-            </div>
-            
-            <div className="space-y-6 overflow-y-auto custom-scrollbar max-h-[calc(100vh-300px)]">
-              {Object.entries(tileTypes).map(([type, typeInfo]) => (
-                <div key={type} className="glass-card rounded-xl p-4">
-                  <div className="flex items-center mb-4">
-                    <span className="text-2xl mr-3">{typeInfo.emoji}</span>
-                    <h3 className="text-lg font-semibold text-slate-200">{typeInfo.name}</h3>
-                    <div className="ml-auto text-xs text-slate-400">
-                      {typeInfo.tiles.length} tiles
+      return (
+        <div className="relative z-10 max-w-full mx-auto p-3 text-white select-none">
+          {/* Compact Header */}
+          <div className="text-center mb-4 fade-in">
+            <h1 className="text-5xl font-black mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-2xl leading-tight">
+              Mahjong AI
+            </h1>
+            <p className="text-sm text-gray-300">Advanced shanten calculator with intelligent discard recommendations</p>
+          </div>
+
+          {/* Two-column layout for laptop efficiency */}
+          <div className="laptop-layout" style={{ gridTemplateColumns: '1fr 1.5fr' }}>
+            {/* Left Column: Tile Selection */}
+            <div className="tile-selection-scroll">
+              <h2 className="text-lg font-bold mb-3 text-center text-gray-200">Select Tiles</h2>
+              
+              <div className="space-y-3">
+                {/* Number suits */}
+                {['man', 'pin', 'sou'].map((suit) => (
+                  <div key={suit} className="glass-effect rounded-lg compact-tile-section border">
+                    <h3 className="text-sm font-semibold mb-2 text-gray-200">{tileTypes[suit].name}</h3>
+                    <div className="tile-grid">
+                      {tileTypes[suit].tiles.map((value) => (
+                        <button
+                          key={`${suit}-${value}`}
+                          onClick={() => addToHand(suit, value)}
+                          disabled={!discardMode && hand.length >= 14 || countTile(suit, value) >= 4}
+                          className={`tile-compact rounded-md ${tileTypes[suit].color} shadow-md tile-hover shimmer focus:outline-none focus:ring-1 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none`}
+                          title={`${value} of ${tileTypes[suit].name}`}
+                        >
+                          {suit === 'man' && `${value}萬`}
+                          {suit === 'pin' && `${value}筒`}
+                          {suit === 'sou' && `${value}索`}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-3 gap-3">
-                    {typeInfo.tiles.map((value) => {
-                      const isMaxed = countTile(type, value) >= 4;
-                      const isHandFull = !discardMode && hand.length >= 14;
-                      const isDisabled = isMaxed || isHandFull;
-                      
-                      return (
+                ))}
+
+                {/* Honor tiles */}
+                <div className="glass-effect rounded-lg compact-tile-section border">
+                  <h3 className="text-sm font-semibold mb-2 text-gray-200">Honors</h3>
+                  <div className="tile-grid">
+                    {['wind', 'dragon'].map((type) => 
+                      tileTypes[type].tiles.map((value) => (
                         <button
                           key={`${type}-${value}`}
                           onClick={() => addToHand(type, value)}
-                          disabled={isDisabled}
-                          className={`tile-compact mahjong-tile rounded-lg text-white font-bold
-                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
-                            focus:outline-none focus:ring-2 focus:ring-white/30
-                            disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none
-                          `}
-                          style={{
-                            '--tile-bg-start': `var(--${type}-start)`,
-                            '--tile-bg-end': `var(--${type}-end)`
-                          }}
-                          title={`${value} of ${typeInfo.name}${isMaxed ? ' (Max 4)' : isHandFull ? ' (Hand Full)' : ''}`}
+                          disabled={!discardMode && hand.length >= 14 || countTile(type, value) >= 4}
+                          className={`tile-compact rounded-md ${tileTypes[type].color} shadow-md tile-hover shimmer focus:outline-none focus:ring-1 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none`}
+                          title={`${type} tile ${value}`}
                         >
-                          {type === 'man' && `${value}萬`}
-                          {type === 'pin' && `${value}筒`}
-                          {type === 'sou' && `${value}索`}
-                          {(type === 'wind' || type === 'dragon') && value}
+                          {value}
                         </button>
-                      );
-                    })}
+                      ))
+                    )}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </aside>
 
-          {/* Main Game Area */}
-          <main className="game-area space-y-6 slide-in-right">
-            {/* Hand Section */}
-            <section className="glass-panel rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <h2 className="text-xl font-bold text-slate-200">Your Hand</h2>
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${shantenStatus.bg} ${shantenStatus.border} border`}>
-                    {shantenStatus.text}
+            {/* Right Column: Game State and Controls */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold mb-3 text-center text-gray-200">Game State</h2>
+              {/* Status Cards */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="glass-effect rounded-lg p-3 text-center border">
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Hand</h3>
+                  <div className="text-xl font-bold text-blue-400">{hand.length}<span className="text-sm text-gray-500">/14</span></div>
+                </div>
+                <div className={`glass-effect rounded-lg p-3 text-center border-2 ${shantenStatus.bg}`}>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Shanten</h3>
+                  <div className={`text-xl font-bold ${shantenStatus.color}`}>{shantenStatus.text}</div>
+                </div>
+                {(() => {
+                  const meldEval = discardPile.length > 0 && hand.length > 0 ? evaluateMeld() : null;
+                  const meldBg = meldEval ? meldEval.bg : 'bg-gray-900/20';
+                  const meldBorder = meldEval ? meldEval.border : 'border-gray-500/30';
+                  
+                  return (
+                    <div className={`glass-effect rounded-lg p-3 text-center border-2 ${meldBg} ${meldBorder}`}>
+                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Melds</h3>
+                      <div className="flex items-center justify-center gap-2">
+                        {discardPile.length > 0 && hand.length > 0 ? (
+                          <>
+                            <div className="relative">
+                              {(() => {
+                                const lastTile = discardPile[discardPile.length - 1];
+                                const baseColor = tileTypes[lastTile.type]?.color ?? "bg-gray-600 text-gray-300";
+                                return (
+                                  <div className={`w-8 h-10 ${baseColor} rounded-sm shadow-sm flex items-center justify-center text-xs font-semibold`}>
+                                    {lastTile.type === "man" && `${lastTile.value}萬`}
+                                    {lastTile.type === "pin" && `${lastTile.value}筒`}
+                                    {lastTile.type === "sou" && `${lastTile.value}索`}
+                                    {lastTile.type === "wind" && lastTile.value}
+                                    {lastTile.type === "dragon" && lastTile.value}
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                            {meldEval ? (
+                              <div className={`text-xs font-semibold px-2 py-1 rounded ${meldEval.color}`}>
+                                {meldEval.action}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-gray-400">No evaluation</div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-sm text-gray-400">
+                            {discardPile.length === 0 ? "No discards" : "No hand"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Hand Display */}
+              <div className="glass-effect rounded-lg compact-section border">
+                <h3 className="text-base font-bold mb-3 text-gray-200">Your Hand</h3>
+                <div className={`min-h-[80px] ${handAnimation}`}>
+                  {hand.length === 0 ? (
+                    <div className="text-center text-gray-400 italic">
+                      <div className="text-2xl mb-2 opacity-50">🀄</div>
+                      <p className="text-sm">Select tiles to begin</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 justify-center items-center">
+                      {hand.map((tile, idx) => {
+                        const baseColor = tileTypes[tile.type]?.color ?? "bg-gray-600 text-gray-300";
+                        const isRecommended = recommendedDiscard?.index === idx;
+                        return (
+                          <button
+                            key={`${tile.type}-${tile.value}-${idx}`}
+                            onClick={() => removeFromHand(idx)}
+                            className={`hand-tile rounded-md shadow-md focus:outline-none transition-all duration-300 shimmer
+                              ${baseColor} 
+                              ${isRecommended 
+                                ? "ring-2 ring-amber-400 pulse-glow transform scale-110 z-10" 
+                                : "tile-hover focus:ring-1 focus:ring-white/50"
+                              }
+                            `}
+                            title={`Remove ${tileToString(tile)}${isRecommended ? ' (Recommended)' : ''}`}
+                          >
+                            {tile.type === "man" && `${tile.value}萬`}
+                            {tile.type === "pin" && `${tile.value}筒`}
+                            {tile.type === "sou" && `${tile.value}索`}
+                            {tile.type === "wind" && tile.value}
+                            {tile.type === "dragon" && tile.value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Discard Pile */}
+              <div className="glass-effect rounded-lg compact-section border">
+                <h3 className="text-base font-bold mb-3 text-gray-200">Discard Pile</h3>
+                <div className="min-h-[80px]">
+                  {discardPile.length === 0 ? (
+                    <div className="text-center text-gray-400 italic">
+                      <div className="text-2xl mb-2 opacity-50">🀄</div>
+                      <p className="text-sm">No discards yet</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1 justify-center items-center">
+                      {getSortedDiscardPile().map((tile, idx) => {
+                        const baseColor = tileTypes[tile.type]?.color ?? "bg-gray-600 text-gray-300";
+                        return (
+                          <button
+                            key={`discard-${tile.type}-${tile.value}-${tile.originalIndex}`}
+                            onClick={() => removeFromDiscardPile(tile.originalIndex)}
+                            className={`hand-tile rounded-md shadow-md focus:outline-none transition-all duration-300 shimmer opacity-85
+                              ${baseColor} tile-hover focus:ring-1 focus:ring-white/50
+                            `}
+                            title={`Remove ${tileToString(tile)} from discard`}
+                          >
+                            {tile.type === "man" && `${tile.value}萬`}
+                            {tile.type === "pin" && `${tile.value}筒`}
+                            {tile.type === "sou" && `${tile.value}索`}
+                            {tile.type === "wind" && tile.value}
+                            {tile.type === "dragon" && tile.value}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* AI Recommendation */}
+              {recommendedDiscard && (
+                <div className="glass-effect rounded-lg p-3 border-2 border-amber-400/40 bg-amber-900/10 fade-in">
+                  <h3 className="text-sm font-bold text-amber-400 mb-2 flex items-center">
+                    <span className="w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center text-amber-900 text-xs font-black mr-2">!</span>
+                    AI Recommendation
+                  </h3>
+                  <div className="text-sm text-gray-200">
+                    <strong className="text-white">{handStatusText}</strong>{" "}
+                    <span className="text-amber-400 font-bold bg-amber-400/20 px-2 py-1 rounded border border-amber-400/40">
+                      {tileToString(recommendedDiscard.tile)}
+                    </span>
+
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    {countImprovingTilesAfterDiscard(hand, recommendedDiscard.index, shanten)} improving tiles available
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-3">
+              )}
+
+              {/* Toggle Switch and Controls */}
+              <div className="space-y-2">
+                <div className="glass-effect rounded-lg p-3 border">
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="text-xs text-gray-300">Add to Hand</span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer" 
+                        checked={discardMode}
+                        onChange={() => setDiscardMode(!discardMode)}
+                      />
+                      <div className={`w-9 h-5 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all ${discardMode ? 'bg-amber-500' : ''}`}></div>
+                    </label>
+                    <span className="text-xs text-gray-300">Discard Tiles</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 justify-center">
                   <button
                     onClick={resetGame}
-                    className="btn-secondary text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
+                    className="bg-gradient-to-br from-red-500 to-red-700 text-white font-bold px-4 py-2 rounded-lg shadow-lg tile-hover shimmer focus:outline-none focus:ring-2 focus:ring-white/50 text-sm relative overflow-hidden"
                     title="Reset game (Ctrl+R)"
                   >
-                    🔄 Reset
+                    Reset Game
                   </button>
                   <button
+                    className="bg-gradient-to-br from-blue-500 to-purple-700 text-white font-bold px-4 py-2 rounded-lg shadow-lg tile-hover shimmer focus:outline-none focus:ring-2 focus:ring-white/50 text-sm relative overflow-hidden"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Learn More
+                  </button>
+                  <button
+                    className="bg-gradient-to-br from-emerald-500 to-green-700 text-white font-bold px-4 py-2 rounded-lg shadow-lg tile-hover shimmer focus:outline-none focus:ring-2 focus:ring-white/50 text-sm relative overflow-hidden"
                     onClick={handleNewHandOrTile}
-                    className="btn-accent font-semibold px-4 py-2 rounded-lg transition-all duration-300"
-                    title={hand.length === 0 ? "Generate random hand (Ctrl+H)" : hand.length === 14 ? "Make AI discard (Ctrl+H)" : "Add random tile (Ctrl+H)"}
+                    title={hand.length === 0 ? "Generate a random hand (Ctrl+H)" : hand.length === 14 ? "Make AI recommended discard (Ctrl+H)" : "Add a random tile (Ctrl+H)"}
                   >
-                    {hand.length === 0 ? '🎲 New Hand' : hand.length === 14 ? '🤖 AI Discard' : '➕ New Tile'}
+                    {hand.length === 0 ? 'New Hand' : hand.length === 14 ? 'AI Discard' : 'New Tile'}
                   </button>
                 </div>
               </div>
-              
-              <div className={`min-h-[120px] ${handAnimation}`}>
-                {hand.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-slate-400">
-                    <div className="text-4xl mb-3 opacity-50">🀄</div>
-                    <p className="text-lg">Select tiles to begin playing</p>
-                    <p className="text-sm mt-1">Click tiles on the left or generate a random hand</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    {hand.map((tile, idx) => {
-                      const typeInfo = tileTypes[tile.type];
-                      const isRecommended = recommendedDiscard?.index === idx;
-                      
-                      return (
-                        <button
-                          key={`${tile.type}-${tile.value}-${idx}`}
-                          onClick={() => removeFromHand(idx)}
-                          className={`tile-standard mahjong-tile rounded-lg text-white font-bold
-                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
-                            focus:outline-none transition-all duration-300
-                            ${isRecommended 
-                              ? "pulse-glow ring-2 ring-amber-400 scale-105 z-10" 
-                              : "focus:ring-2 focus:ring-white/30"
-                            }
-                          `}
-                          title={`Remove ${tileToString(tile)}${isRecommended ? ' (AI Recommended)' : ''}`}
-                        >
-                          {tile.type === 'man' && `${tile.value}萬`}
-                          {tile.type === 'pin' && `${tile.value}筒`}
-                          {tile.type === 'sou' && `${tile.value}索`}
-                          {(tile.type === 'wind' || tile.type === 'dragon') && tile.value}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </section>
 
-            {/* Discard Pile Section */}
-            <section className="glass-panel rounded-2xl p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-slate-200">Discard Pile</h2>
-                <div className="text-sm text-slate-400">
-                  {discardPile.length} tiles discarded
-                </div>
-              </div>
-              
-              <div className="min-h-[120px]">
-                {discardPile.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-slate-400">
-                    <div className="text-4xl mb-3 opacity-50">🗑️</div>
-                    <p className="text-lg">No discarded tiles yet</p>
-                    <p className="text-sm mt-1">Tiles you discard will appear here</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    {getSortedDiscardPile().map((tile, idx) => {
-                      const typeInfo = tileTypes[tile.type];
-                      
-                      return (
-                        <button
-                          key={`discard-${tile.type}-${tile.value}-${tile.originalIndex}`}
-                          onClick={() => removeFromDiscardPile(tile.originalIndex)}
-                          className={`tile-standard mahjong-tile rounded-lg text-white font-bold opacity-75
-                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
-                            focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300
-                            hover:opacity-100
-                          `}
-                          title={`Remove ${tileToString(tile)} from discard`}
-                        >
-                          {tile.type === 'man' && `${tile.value}萬`}
-                          {tile.type === 'pin' && `${tile.value}筒`}
-                          {tile.type === 'sou' && `${tile.value}索`}
-                          {(tile.type === 'wind' || tile.type === 'dragon') && tile.value}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </section>
-          </main>
-
-          {/* Stats and AI Panel */}
-          <aside className="stats-area glass-panel rounded-2xl p-6 overflow-hidden slide-in-right">
-            <h2 className="text-xl font-bold text-slate-200 mb-6">AI Analysis</h2>
-            
-            {/* AI Recommendation */}
-            {recommendedDiscard && (
-              <div className="glass-card rounded-xl p-4 mb-6 border-2 border-amber-400/30 bg-gradient-to-br from-amber-500/10 to-yellow-500/10">
-                <div className="flex items-center mb-3">
-                  <div className="w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-amber-900 text-sm font-black mr-3">
-                    🤖
-                  </div>
-                  <h3 className="text-lg font-bold text-amber-400">Recommendation</h3>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-300">{handStatusText}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className={`tile-compact mahjong-tile rounded-lg text-white font-bold
-                        bg-gradient-to-br ${tileTypes[recommendedDiscard.tile.type].color}
-                      `}>
-                        {recommendedDiscard.tile.type === 'man' && `${recommendedDiscard.tile.value}萬`}
-                        {recommendedDiscard.tile.type === 'pin' && `${recommendedDiscard.tile.value}筒`}
-                        {recommendedDiscard.tile.type === 'sou' && `${recommendedDiscard.tile.value}索`}
-                        {(recommendedDiscard.tile.type === 'wind' || recommendedDiscard.tile.type === 'dragon') && recommendedDiscard.tile.value}
-                      </div>
+              {/* Tips Section */}
+              {showTips && (
+                <div className="glass-effect rounded-lg p-3 border fade-in">
+                  <h3 className="text-sm font-bold text-emerald-400 mb-2">Quick Tips</h3>
+                  <div className="grid grid-cols-1 gap-2 text-xs text-gray-300">
+                    <div className="bg-gray-800/50 rounded p-2 border border-gray-700/50">
+                      <h4 className="font-semibold text-amber-400 mb-1">Shanten:</h4>
+                      <p>-1: Win | 0: Ready | 1-3: Close | 4+: Early</p>
+                    </div>
+                    <div className="bg-gray-800/50 rounded p-2 border border-gray-700/50">
+                      <h4 className="font-semibold text-blue-400 mb-1">Strategy:</h4>
+                      <p>Follow AI • Keep versatile tiles • Build sequences</p>
                     </div>
                   </div>
-                  
-                  <div className="text-sm text-slate-400">
-                    <strong className="text-amber-400">
-                      {countImprovingTilesAfterDiscard(hand, recommendedDiscard.index, shanten)}
-                    </strong> improving tiles available
-                  </div>
-                  
-                  <button
-                    onClick={handleAIDiscard}
-                    className="w-full btn-primary text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
-                  >
-                    Apply Recommendation
-                  </button>
                 </div>
-              </div>
-            )}
-
-            {/* Quick Stats */}
-            <div className="space-y-4">
-              <div className="glass-card rounded-xl p-4">
-                <h3 className="text-lg font-semibold text-slate-200 mb-3">Game Statistics</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Hand Efficiency</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-red-500 to-green-500 transition-all duration-500"
-                          style={{ width: `${Math.max(0, (8 - Math.max(shanten, 0)) / 8 * 100)}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-slate-300">
-                        {Math.round(Math.max(0, (8 - Math.max(shanten, 0)) / 8 * 100))}%
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Tiles Remaining</span>
-                    <span className="text-slate-300">{136 - hand.length - discardPile.length}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Unique Tiles</span>
-                    <span className="text-slate-300">
-                      {new Set(hand.map(tile => `${tile.type}-${tile.value}`)).size}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Keyboard Shortcuts */}
-              <div className="glass-card rounded-xl p-4">
-                <h3 className="text-lg font-semibold text-slate-200 mb-3">Shortcuts</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Reset Game</span>
-                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+R</code>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">New Hand/Tile</span>
-                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+H</code>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">AI Discard</span>
-                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+D</code>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Close Modal</span>
-                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Esc</code>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
-          </aside>
-        </div>
-      );          {/* Enhanced Modal */}
+          </div>
+
+          {/* Compact Modal */}
           {showModal && (
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 fade-in-up"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 fade-in z-50"
               role="dialog"
               aria-modal="true"
-              onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+              tabIndex={-1}
+              onKeyDown={(e) => { if (e.key === "Escape") setShowModal(false); }}
             >
-              <div className="glass-panel rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden scale-in">
-                <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center text-xl">
-                      🀄
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">Mahjong AI Guide</h2>
-                      <p className="text-slate-400">Master the art of Mahjong strategy</p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors"
-                    onClick={() => setShowModal(false)}
-                    aria-label="Close dialog"
-                  >
-                    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
+              <div className="glass-effect rounded-xl max-w-2xl w-full p-4 relative shadow-2xl max-h-[80vh] overflow-y-auto slide-in border">
+                <h2 className="text-xl font-bold mb-4 text-white">About Mahjong AI</h2>
                 
-                <div className="p-6 overflow-y-auto custom-scrollbar max-h-[calc(90vh-100px)]">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* What is Shanten */}
-                    <div className="glass-card rounded-2xl p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
-                          📊
-                        </div>
-                        <h3 className="text-xl font-bold text-blue-400">Understanding Shanten</h3>
-                      </div>
-                      <div className="space-y-3 text-slate-300 leading-relaxed">
-                        <p>
-                          The <strong className="text-blue-400">shanten number</strong> represents how many tiles away your hand is from being ready to win (tenpai).
-                        </p>
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">-1</div>
-                            <span>Winning hand (ready to declare victory)</span>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold">0</div>
-                            <span>Tenpai (ready to win on next draw)</span>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold">1-3</div>
-                            <span>Close to winning</span>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 font-bold">4+</div>
-                            <span>Early stage, needs work</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                <div className="space-y-3 text-gray-200 leading-relaxed text-sm">
+                  <div>
+                    <h3 className="text-base font-semibold text-blue-400 mb-2">What is Shanten?</h3>
+                    <p>
+                      The shanten number represents how many tiles away your hand is from being ready to win (tenpai). 
+                      A lower shanten means you're closer to winning. The AI calculates this using advanced algorithms 
+                      that consider all possible melds, pairs, and sequences.
+                    </p>
+                  </div>
 
-                    {/* How AI Works */}
-                    <div className="glass-card rounded-2xl p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3">
-                          🤖
-                        </div>
-                        <h3 className="text-xl font-bold text-purple-400">AI Strategy Engine</h3>
-                      </div>
-                      <div className="space-y-3 text-slate-300 leading-relaxed">
-                        <p>
-                          Our AI analyzes every possible discard using advanced algorithms that consider:
-                        </p>
-                        <ul className="space-y-2">
-                          <li className="flex items-start space-x-2">
-                            <span className="text-purple-400 mt-1">•</span>
-                            <span>All possible hand combinations and melds</span>
-                          </li>
-                          <li className="flex items-start space-x-2">
-                            <span className="text-purple-400 mt-1">•</span>
-                            <span>Remaining tiles in the wall</span>
-                          </li>
-                          <li className="flex items-start space-x-2">
-                            <span className="text-purple-400 mt-1">•</span>
-                            <span>Visible tiles in discard pile</span>
-                          </li>
-                          <li className="flex items-start space-x-2">
-                            <span className="text-purple-400 mt-1">•</span>
-                            <span>Probability of drawing improving tiles</span>
-                          </li>
+                  <div>
+                    <h3 className="text-base font-semibold text-emerald-400 mb-2">How It Works</h3>
+                    <p>
+                      The AI evaluates every possible discard and recommends the one that minimizes your shanten number 
+                      or maximizes your winning chances. It uses recursive algorithms to explore all possible hand 
+                      combinations and calculates improving tiles for each option, taking into account visible tiles 
+                      in the discard pile.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-purple-400 mb-2">Tile Types</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/50">
+                        <h4 className="font-semibold mb-1">Number Suits:</h4>
+                        <ul className="space-y-1 text-xs">
+                          <li><strong className="text-red-400">Characters (萬)</strong> - Red tiles with Chinese numerals</li>
+                          <li><strong className="text-amber-400">Dots (筒)</strong> - Orange tiles with circular patterns</li>
+                          <li><strong className="text-emerald-400">Bamboo (索)</strong> - Green tiles with bamboo designs</li>
                         </ul>
-                        <p className="text-sm text-slate-400 bg-slate-800/50 rounded-lg p-3">
-                          <strong>Pro Tip:</strong> The yellow highlighted tile in your hand shows the AI's recommendation. 
-                          It calculates the discard that gives you the best chance of improving your hand.
-                        </p>
                       </div>
-                    </div>
-
-                    {/* Tile Types */}
-                    <div className="glass-card rounded-2xl p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mr-3">
-                          🀙
-                        </div>
-                        <h3 className="text-xl font-bold text-green-400">Tile Categories</h3>
-                      </div>
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-semibold text-white mb-2">Number Suits (Simples)</h4>
-                          <div className="grid grid-cols-1 gap-2">
-                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
-                              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded flex items-center justify-center text-white text-xs font-bold">1萬</div>
-                              <span className="text-slate-300">Characters (萬) - Red tiles</span>
-                            </div>
-                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
-                              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded flex items-center justify-center text-white text-xs font-bold">1筒</div>
-                              <span className="text-slate-300">Dots (筒) - Orange tiles</span>
-                            </div>
-                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
-                              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-700 rounded flex items-center justify-center text-white text-xs font-bold">1索</div>
-                              <span className="text-slate-300">Bamboo (索) - Green tiles</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <h4 className="font-semibold text-white mb-2">Honor Tiles</h4>
-                          <div className="grid grid-cols-1 gap-2">
-                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
-                              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-700 rounded flex items-center justify-center text-white text-xs font-bold">東</div>
-                              <span className="text-slate-300">Winds (東南西北) - Purple tiles</span>
-                            </div>
-                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
-                              <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-700 rounded flex items-center justify-center text-white text-xs font-bold">中</div>
-                              <span className="text-slate-300">Dragons (中發白) - Blue tiles</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* How to Use */}
-                    <div className="glass-card rounded-2xl p-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center mr-3">
-                          🎮
-                        </div>
-                        <h3 className="text-xl font-bold text-cyan-400">How to Play</h3>
-                      </div>
-                      <div className="space-y-3">
-                        <ol className="space-y-3">
-                          <li className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">1</div>
-                            <span className="text-slate-300">Click tiles on the left panel to add them to your hand (max 14 tiles)</span>
-                          </li>
-                          <li className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">2</div>
-                            <span className="text-slate-300">Watch the shanten number update in real-time as you build your hand</span>
-                          </li>
-                          <li className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">3</div>
-                            <span className="text-slate-300">Follow AI recommendations (highlighted tiles) for optimal play</span>
-                          </li>
-                          <li className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">4</div>
-                            <span className="text-slate-300">Click tiles in your hand to discard them</span>
-                          </li>
-                          <li className="flex items-start space-x-3">
-                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">5</div>
-                            <span className="text-slate-300">Use the toggle to switch between adding to hand or discard pile</span>
-                          </li>
-                        </ol>
-
-                        <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
-                          <h4 className="font-semibold text-amber-400 mb-2">Strategy Tips</h4>
-                          <ul className="text-sm text-slate-300 space-y-1">
-                            <li>• Always follow AI recommendations for optimal play</li>
-                            <li>• Keep versatile tiles that can form multiple combinations</li>
-                            <li>• Build sequences (123) rather than triplets when possible</li>
-                            <li>• Honor tiles are harder to use - consider discarding early</li>
-                            <li>• Pay attention to the improving tiles count</li>
-                          </ul>
-                        </div>
+                      <div className="bg-gray-800/50 rounded-lg p-2 border border-gray-700/50">
+                        <h4 className="font-semibold mb-1">Honor Tiles:</h4>
+                        <ul className="space-y-1 text-xs">
+                          <li><strong className="text-violet-400">Winds</strong> - East, South, West, North</li>
+                          <li><strong className="text-cyan-400">Dragons</strong> - Red, Green, White</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
 
-                  {/* Keyboard shortcuts at bottom */}
-                  <div className="mt-8 glass-card rounded-2xl p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-                      <div className="w-10 h-10 rounded-lg bg-slate-500/20 flex items-center justify-center mr-3">
-                        ⌨️
-                      </div>
-                      Keyboard Shortcuts
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center">
-                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+R</code>
-                        <span className="text-sm text-slate-400">Reset Game</span>
-                      </div>
-                      <div className="text-center">
-                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+H</code>
-                        <span className="text-sm text-slate-400">New Hand/Tile</span>
-                      </div>
-                      <div className="text-center">
-                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+D</code>
-                        <span className="text-sm text-slate-400">AI Discard</span>
-                      </div>
-                      <div className="text-center">
-                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Esc</code>
-                        <span className="text-sm text-slate-400">Close Modal</span>
-                      </div>
-                    </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-amber-400 mb-2">How to Use</h3>
+                    <ol className="list-decimal list-inside space-y-1 text-xs">
+                      <li>Click tiles on the left to add them to your hand (maximum 14 tiles)</li>
+                      <li>Watch the shanten number update in real-time</li>
+                      <li>Follow the AI's discard recommendations (highlighted in yellow)</li>
+                      <li>Click tiles in your hand to discard them automatically</li>
+                      <li>Use the toggle switch to change between adding to hand or discarding directly</li>
+                      <li>Click tiles in the discard pile to remove them if needed</li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-cyan-400 mb-2">Strategy Tips</h3>
+                    <ul className="text-xs space-y-1">
+                      <li>• Follow AI recommendations for optimal play</li>
+                      <li>• Keep versatile tiles that can form multiple combinations</li>
+                      <li>• Build towards sequences (runs) rather than triplets when possible</li>
+                      <li>• Consider honor tiles carefully as they're harder to use</li>
+                      <li>• Pay attention to the improving tiles count for each discard option</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-green-400 mb-2">Keyboard Shortcuts</h3>
+                    <ul className="text-xs space-y-1">
+                      <li><strong>Ctrl+R:</strong> Reset game</li>
+                      <li><strong>Ctrl+H:</strong> New hand/New tile</li>
+                      <li><strong>Ctrl+D:</strong> Apply AI discard recommendation</li>
+                      <li><strong>Esc:</strong> Close modal</li>
+                    </ul>
                   </div>
                 </div>
+
+                <button
+                  className="absolute top-3 right-3 text-gray-400 hover:text-white focus:outline-none tile-hover p-1"
+                  onClick={() => setShowModal(false)}
+                  aria-label="Close dialog"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
