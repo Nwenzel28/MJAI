@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mahjong AI - Advanced Strategy Calculator</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React and ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Babel standalone for JSX support -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* Modern animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+      }
+      50% { 
+        transform: scale(1.02); 
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+      }
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Animation classes */
+    .fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+    .slide-in-right { animation: slideInRight 0.5s ease-out forwards; }
+    .slide-in-left { animation: slideInLeft 0.5s ease-out forwards; }
+    .scale-in { animation: scaleIn 0.4s ease-out forwards; }
+    .pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+    .float { animation: float 6s ease-in-out infinite; }
+
+    /* Modern glass morphism */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-card {
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Enhanced tile styles */
+    .mahjong-tile {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(135deg, var(--tile-bg-start), var(--tile-bg-end));
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    }
+    
+    .mahjong-tile:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 
+        0 10px 25px -5px rgba(0, 0, 0, 0.25),
+        0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    .mahjong-tile:active {
+      transform: translateY(0) scale(0.98);
+      transition: all 0.1s;
+    }
+
+    .mahjong-tile::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+
+    .mahjong-tile:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* Tile size variants */
+    .tile-compact {
+      width: 52px;
+      height: 66px;
+      min-width: 52px;
+      min-height: 66px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    .tile-standard {
+      width: 56px;
+      height: 72px;
+      min-width: 56px;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* Dashboard layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 400px 1fr 320px;
+      grid-template-rows: auto 1fr;
+      grid-template-areas: 
+        "header header header"
+        "tiles game-area stats";
+      gap: 1.5rem;
+      height: 100vh;
+      max-height: 100vh;
+    }
+
+    .header-area { grid-area: header; }
+    .tiles-area { grid-area: tiles; }
+    .game-area { grid-area: game-area; }
+    .stats-area { grid-area: stats; }
+
+    @media (max-width: 1400px) {
+      .dashboard-grid {
+        grid-template-columns: 350px 1fr 280px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+          "header"
+          "game-area"
+          "tiles"
+          "stats";
+        height: auto;
+        max-height: none;
+      }
+    }
+
+    /* Scrollbar styling */
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgba(148, 163, 184, 0.3);
+      border-radius: 3px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(148, 163, 184, 0.5);
+    }
+
+    /* Status indicator */
+    .status-indicator {
+      position: relative;
+    }
+
+    .status-indicator::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--indicator-color);
+      box-shadow: 0 0 6px var(--indicator-color);
+    }
+
+    /* Gradient backgrounds */
+    .bg-gradient-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .bg-gradient-secondary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .bg-gradient-accent {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    /* Button variants */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 6px 20px rgba(250, 112, 154, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #1f2937;
+      box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+    }
+
+    .btn-accent:hover {
+      box-shadow: 0 6px 20px rgba(168, 237, 234, 0.6);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 min-h-screen font-sans overflow-hidden">
+  <!-- Animated background -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full filter blur-3xl float"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full filter blur-3xl float" style="animation-delay: -2s;"></div>
+    <div class="absolute top-1/3 left-1/3 w-80 h-80 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 rounded-full filter blur-3xl float" style="animation-delay: -4s;"></div>
+  </div>
+
+  <!-- Loading screen -->
+  <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
+    <div class="text-center">
+      <div class="relative w-32 h-32 mb-8 mx-auto">
+        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 animate-spin opacity-20" style="border: 8px solid transparent; border-top-color: currentColor;"></div>
+        <div class="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 animate-spin opacity-40" style="border: 6px solid transparent; border-top-color: currentColor; animation-duration: 1.5s; animation-direction: reverse;"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-5xl animate-pulse">🀄</span>
+        </div>
+      </div>
+      <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 mb-2">
+        Mahjong AI
+      </h2>
+      <p class="text-gray-400">Initializing advanced strategy engine...</p>
+    </div>
+  </div>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // Enhanced loading screen
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          loadingScreen.style.transition = 'opacity 0.8s ease-out';
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 800);
+        }
+      }, 2000);
+    });
+
+    const tileTypes = {
+      man: { 
+        color: "from-red-500 to-red-700", 
+        shadow: "shadow-red-500/25", 
+        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
+        name: "Characters",
+        emoji: "🀇"
+      },
+      pin: { 
+        color: "from-amber-500 to-orange-600", 
+        shadow: "shadow-amber-500/25", 
+        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
+        name: "Dots",
+        emoji: "🀙"
+      },
+      sou: { 
+        color: "from-emerald-500 to-green-700", 
+        shadow: "shadow-emerald-500/25", 
+        tiles: ["1", "2", "3", "4", "5", "6", "7", "8", "9"], 
+        name: "Bamboo",
+        emoji: "🀐"
+      },
+      wind: { 
+        color: "from-violet-500 to-purple-700", 
+        shadow: "shadow-violet-500/25", 
+        tiles: ["東", "南", "西", "北"], 
+        name: "Winds",
+        emoji: "🀀"
+      },
+      dragon: { 
+        color: "from-cyan-500 to-blue-700", 
+        shadow: "shadow-cyan-500/25", 
+        tiles: ["中", "發", "白"], 
+        name: "Dragons",
+        emoji: "🀄"
+      },
+    };
+
+    const tileToString = (tile) => {
+      if (tile.type === "man") return `${tile.value}-Characters`;
+      if (tile.type === "pin") return `${tile.value}-Dots`;
+      if (tile.type === "sou") return `${tile.value}-Bamboo`;
+      if (tile.type === "wind") {
+        const mapping = { 東: "East", 南: "South", 西: "West", 北: "North" };
+        return mapping[tile.value];
+      }
+      if (tile.type === "dragon") {
+        const mapping = { 中: "Red", 發: "Green", 白: "White" };
+        return mapping[tile.value];
+      }
+      return "";
+    };    const tileIndices = (() => {
+      const suits = ['Characters', 'Dots', 'Bamboo'];
+      const honors = ['East', 'South', 'West', 'North', 'White', 'Green', 'Red'];
+      const idx = {};
+      let index = 0;
+      for (let suit of suits) {
+        for (let i = 1; i <= 9; i++) {
+          idx[`${i}-${suit}`] = index++;
+        }
+      }
+      for (let honor of honors) {
+        idx[honor] = index++;
+      }
+      return idx;
+    })();
+
+    function handToArray(hand) {
+      const arr = Array(34).fill(0);
+      for (const tile of hand) {
+        const idx = tileIndices[tileToString(tile)];
+        if (idx !== undefined) arr[idx]++;
+      }
+      return arr;
+    }
+
+    function getMeldsNeeded(hand, overrideCount = null) {
+      const count = overrideCount ?? hand.length;
+      if (count < 2) return -5;
+      return Math.min(4, Math.ceil((count - 2) / 3));
+    }
+
+    function shantenCount(hand, fixedSize = null) {
+      const counts = handToArray(hand);
+      const count = fixedSize ?? hand.length;
+      const neededMelds = getMeldsNeeded(hand, count);
+
+      const memo = new Map();
+      function dfs(tiles, melds, taatsu, pairUsed, idx) {
+        const key = tiles.join(',') + '|' + melds + '|' + taatsu + '|' + pairUsed + '|' + idx;
+        if (memo.has(key)) return memo.get(key);
+        while (idx < 34 && tiles[idx] === 0) idx++;
+        if (idx === 34) {
+          const usableTaatsu = Math.min(neededMelds - melds, taatsu);
+          const shanten = 2 * neededMelds - 2 * melds - usableTaatsu - (pairUsed ? 1 : 0);
+          memo.set(key, shanten);
+          return shanten;
+        }
+        let res = 8;
+        if (!pairUsed && tiles[idx] >= 2) {
+          tiles[idx] -= 2;
+          res = Math.min(res, dfs(tiles, melds, taatsu, true, idx));
+          tiles[idx] += 2;
+        }
+        if (tiles[idx] >= 3) {
+          tiles[idx] -= 3;
+          res = Math.min(res, dfs(tiles, melds + 1, taatsu, pairUsed, idx));
+          tiles[idx] += 3;
+        }
+        if (idx < 27 && idx % 9 <= 6 && tiles[idx] >= 1 && tiles[idx + 1] >= 1 && tiles[idx + 2] >= 1) {
+          tiles[idx]--;
+          tiles[idx + 1]--;
+          tiles[idx + 2]--;
+          res = Math.min(res, dfs(tiles, melds + 1, taatsu, pairUsed, idx));
+          tiles[idx]++;
+          tiles[idx + 1]++;
+          tiles[idx + 2]++;
+        }
+        if (tiles[idx] >= 2) {
+          tiles[idx] -= 2;
+          res = Math.min(res, dfs(tiles, melds, taatsu + 1, pairUsed, idx));
+          tiles[idx] += 2;
+        }
+        if (idx < 27) {
+          if (idx % 9 <= 7 && tiles[idx] >= 1 && tiles[idx + 1] >= 1) {
+            tiles[idx]--;
+            tiles[idx + 1]--;
+            res = Math.min(res, dfs(tiles, melds, taatsu + 1, pairUsed, idx));
+            tiles[idx]++;
+            tiles[idx + 1]++;
+          }
+          if (idx % 9 <= 6 && tiles[idx] >= 1 && tiles[idx + 2] >= 1) {
+            tiles[idx]--;
+            tiles[idx + 2]--;
+            res = Math.min(res, dfs(tiles, melds, taatsu + 1, pairUsed, idx));
+            tiles[idx]++;
+            tiles[idx + 2]++;
+          }
+        }
+        res = Math.min(res, dfs(tiles, melds, taatsu, pairUsed, idx + 1));
+        memo.set(key, res);
+        return res;
+      }
+
+      return Math.max(dfs(counts, 0, 0, false, 0), -1);
+    }
+
+    function App() {
+      const [hand, setHand] = React.useState([]);
+      const [discardPile, setDiscardPile] = React.useState([]);
+      const [discardMode, setDiscardMode] = React.useState(false);
+      const [showModal, setShowModal] = React.useState(false);
+      const [handAnimation, setHandAnimation] = React.useState('');
+      const [activeSection, setActiveSection] = React.useState('tiles');
+      
+      // Keyboard shortcuts
+      React.useEffect(() => {
+        const handleKeyboard = (e) => {
+          if (e.key === 'r' && e.ctrlKey) {
+            e.preventDefault();
+            resetGame();
+          } else if (e.key === 'Escape') {
+            setShowModal(false);
+          } else if (e.key === 'h' && e.ctrlKey) {
+            e.preventDefault();
+            handleNewHandOrTile();
+          } else if (e.key === 'd' && e.ctrlKey) {
+            e.preventDefault();
+            handleAIDiscard();
+          } else if (e.key >= '1' && e.key <= '5') {
+            const sections = ['tiles', 'hand', 'discard', 'stats', 'help'];
+            setActiveSection(sections[parseInt(e.key) - 1]);
+          }
+        };
+        window.addEventListener('keydown', handleKeyboard);
+        return () => window.removeEventListener('keydown', handleKeyboard);
+      }, []);
+      
+      // Sorting function for tiles
+      const getTileSortValue = (tile) => {
+        const typeOrder = { man: 1, pin: 2, sou: 3, wind: 4, dragon: 5 };
+        
+        let valueOrder = 0;
+        if (tile.type === 'man' || tile.type === 'pin' || tile.type === 'sou') {
+          valueOrder = parseInt(tile.value);
+        } else if (tile.type === 'wind') {
+          const windOrder = { '東': 1, '南': 2, '西': 3, '北': 4 };
+          valueOrder = windOrder[tile.value] || 0;
+        } else if (tile.type === 'dragon') {
+          const dragonOrder = { '中': 1, '發': 2, '白': 3 };
+          valueOrder = dragonOrder[tile.value] || 0;
+        }
+        
+        return (typeOrder[tile.type] * 100) + valueOrder;
+      };
+      
+      const getSortedDiscardPile = () => {
+        return discardPile.map((tile, index) => ({
+          ...tile,
+          originalIndex: index
+        })).sort((a, b) => {
+          return getTileSortValue(a) - getTileSortValue(b);
+        });
+      };
+
+      const countTile = (type, value) => {
+        return hand.filter(tile => tile.type === type && tile.value === value).length +
+               discardPile.filter(tile => tile.type === type && tile.value === value).length;
+      };
+
+      const addToHand = (type, value) => {
+        if (discardMode) {
+          addToDiscardPile(type, value);
+          return;
+        }
+        
+        if (countTile(type, value) >= 4) return;
+        if (hand.length >= 14) return;
+        
+        const newTile = { type, value };
+        const newHand = getSortedHand([...hand, newTile]);
+        setHand(newHand);
+        setHandAnimation('scale-in');
+        setTimeout(() => setHandAnimation(''), 400);
+      };
+      
+      const addToDiscardPile = (type, value) => {
+        if (countTile(type, value) >= 4) return;
+        setDiscardPile([...discardPile, { type, value }]);
+      };
+
+      const removeFromHand = (index) => {
+        if (index < 0 || index >= hand.length) return;
+        
+        const newHand = [...hand];
+        const removed = newHand.splice(index, 1)[0];
+        setHand(newHand);
+        
+        if (removed) {
+          setDiscardPile([...discardPile, { type: removed.type, value: removed.value }]);
+        }
+      };
+      
+      const removeFromDiscardPile = (index) => {
+        if (index < 0 || index >= discardPile.length) return;
+        
+        const newDiscardPile = [...discardPile];
+        newDiscardPile.splice(index, 1);
+        setDiscardPile(newDiscardPile);
+      };
+
+      const resetGame = () => {
+        setHand([]);
+        setDiscardPile([]);
+        setHandAnimation('fade-in-up');
+        setTimeout(() => setHandAnimation(''), 600);
+      };
+
+      // Sort hand tiles using the same logic as discard pile
+      const getSortedHand = (handToSort) => {
+        return [...handToSort].sort((a, b) => {
+          return getTileSortValue(a) - getTileSortValue(b);
+        });
+      };
+      
+      // Generate a random hand of 13 tiles
+      const generateRandomHand = () => {
+        const newHand = [];
+        const tempDiscardPile = [...discardPile];
+        
+        for (let i = 0; i < 13; i++) {
+          const allTiles = generateAllTiles();
+          const availableTiles = allTiles.filter(tile => {
+            const currentCount = newHand.filter(t => t.type === tile.type && t.value === tile.value).length +
+                                tempDiscardPile.filter(t => t.type === tile.type && t.value === tile.value).length;
+            return currentCount < 4;
+          });
+          
+          if (availableTiles.length === 0) break;
+          
+          const randomIndex = Math.floor(Math.random() * availableTiles.length);
+          newHand.push(availableTiles[randomIndex]);
+        }
+        
+        return getSortedHand(newHand);
+      };
+
+      // Generate a random tile that respects the 4-tile limit
+      const generateRandomTile = () => {
+        const allTiles = generateAllTiles();
+        const availableTiles = allTiles.filter(tile => {
+          return countSpecificTile(tile.type, tile.value) < 4;
+        });
+        
+        if (availableTiles.length === 0) return null;
+        
+        const randomIndex = Math.floor(Math.random() * availableTiles.length);
+        return availableTiles[randomIndex];
+      };
+
+      // AI recommended discard handler
+      const handleAIDiscard = () => {
+        if (recommendedDiscard && isStandardHandSize) {
+          removeFromHand(recommendedDiscard.index);
+        }
+      };
+
+      // Handle new hand/new tile button click
+      const handleNewHandOrTile = () => {
+        if (hand.length === 0) {
+          const newHand = generateRandomHand();
+          setHand(newHand);
+          setHandAnimation('slide-in-right');
+          setTimeout(() => setHandAnimation(''), 500);
+        } else if (hand.length === 14 && recommendedDiscard) {
+          removeFromHand(recommendedDiscard.index);
+        } else {
+          if (hand.length >= 14) return;
+          
+          const newTile = generateRandomTile();
+          if (newTile) {
+            const newHand = getSortedHand([...hand, newTile]);
+            setHand(newHand);
+            setHandAnimation('scale-in');
+            setTimeout(() => setHandAnimation(''), 400);
+          }
+        }
+      };
+
+      const isStandardHandSize = [14, 11, 8, 5, 2].includes(hand.length);
+      const handStatusText = isStandardHandSize ? "Discard:" : "Draw";
+
+      const improvingMemo = React.useRef(new Map()).current;
+
+      const generateAllTiles = () => {
+        const all = [];
+        for (const [type, { tiles }] of Object.entries(tileTypes)) {
+          for (const value of tiles) {
+            all.push({ type, value });
+          }
+        }
+        return all;
+      };
+
+      const countSpecificTile = (type, value) => {
+        const inHand = hand.filter(tile => tile.type === type && tile.value === value).length;
+        const inDiscard = discardPile.filter(tile => tile.type === type && tile.value === value).length;
+        return inHand + inDiscard;
+      };
+      
+      const getRemainingTileCount = (type, value) => {
+        const maxPerTile = 4;
+        const inPlay = countSpecificTile(type, value);
+        return Math.max(0, maxPerTile - inPlay);
+      };
+
+      function countImprovingTilesAfterDiscard(originalHand, discardIndex, baseShanten = null) {
+        const baseCount = originalHand.length - 1;
+        const handCopy = [...originalHand];
+        handCopy.splice(discardIndex, 1);
+
+        const handKey = handCopy.map(tileToString).sort().join(',') + '|' + discardPile.map(tileToString).sort().join(',');
+        if (improvingMemo.has(handKey)) return improvingMemo.get(handKey);
+
+        const allTiles = generateAllTiles();
+        const currentShanten = baseShanten ?? shantenCount(handCopy, baseCount);
+        let improvingTiles = new Set();
+        let totalImprovingTiles = 0;
+
+        for (let tile of allTiles) {
+          const newHand = [...handCopy, tile];
+          const newShanten = shantenCount(newHand, baseCount + 1);
+          
+          if (newShanten < currentShanten) {
+            const tileKey = `${tile.type}:${tile.value}`;
+            if (!improvingTiles.has(tileKey)) {
+              improvingTiles.add(tileKey);
+              const remaining = getRemainingTileCount(tile.type, tile.value);
+              totalImprovingTiles += remaining;
+            }
+          }
+        }
+
+        improvingMemo.set(handKey, totalImprovingTiles);
+        return totalImprovingTiles;
+      }
+
+      const shanten = React.useMemo(() => shantenCount(hand), [hand]);
+
+      const recommendedDiscard = React.useMemo(() => {
+        if (!isStandardHandSize) return null;
+
+        let minShanten = Infinity;
+        let candidates = [];
+
+        for (let i = 0; i < hand.length; i++) {
+          const tempHand = [...hand];
+          tempHand.splice(i, 1);
+          const tempShanten = shantenCount(tempHand);
+
+          if (tempShanten < minShanten) {
+            minShanten = tempShanten;
+            candidates = [{ tile: hand[i], index: i }];
+          } else if (tempShanten === minShanten) {
+            candidates.push({ tile: hand[i], index: i });
+          }
+        }
+
+        if (candidates.length === 0) return null;
+
+        let best = null;
+        let bestImprove = -1;
+        for (const c of candidates) {
+          const improve = countImprovingTilesAfterDiscard(hand, c.index, shanten);
+          if (improve > bestImprove) {
+            bestImprove = improve;
+            best = c;
+          }
+        }
+
+        return best;
+      }, [hand, shanten]);
+
+      const getShantenStatus = () => {
+        if (shanten === -1) return { 
+          text: "Winning Hand!", 
+          color: "text-emerald-400", 
+          bg: "from-emerald-500/20 to-green-500/20",
+          border: "border-emerald-400/50",
+          indicator: "#10b981"
+        };
+        if (shanten === 0) return { 
+          text: "Ready (Tenpai)", 
+          color: "text-amber-400", 
+          bg: "from-amber-500/20 to-yellow-500/20",
+          border: "border-amber-400/50",
+          indicator: "#f59e0b"
+        };
+        if (shanten <= 2) return { 
+          text: `${shanten} away`, 
+          color: "text-orange-400", 
+          bg: "from-orange-500/20 to-red-500/20",
+          border: "border-orange-400/50",
+          indicator: "#f97316"
+        };
+        return { 
+          text: `${shanten} away`, 
+          color: "text-red-400", 
+          bg: "from-red-500/20 to-pink-500/20",
+          border: "border-red-400/50",
+          indicator: "#ef4444"
+        };
+      };
+
+      const shantenStatus = getShantenStatus();      return (
+        <div className="dashboard-grid p-6 text-white">
+          {/* Header */}
+          <header className="header-area glass-panel rounded-2xl p-6 fade-in-up">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center text-2xl">
+                  🀄
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    Mahjong AI
+                  </h1>
+                  <p className="text-slate-400 text-sm">Advanced Strategy Calculator</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">{hand.length}</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Hand Size</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">{discardPile.length}</div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Discarded</div>
+                  </div>
+                  <div className={`text-center status-indicator`} style={{'--indicator-color': shantenStatus.indicator}}>
+                    <div className={`text-2xl font-bold ${shantenStatus.color}`}>
+                      {shanten === -1 ? '🏆' : shanten}
+                    </div>
+                    <div className="text-xs text-slate-400 uppercase tracking-wide">Shanten</div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="btn-primary text-white font-semibold px-6 py-3 rounded-xl transition-all duration-300"
+                >
+                  Help & Info
+                </button>
+              </div>
+            </div>
+          </header>
+
+          {/* Tile Selection Panel */}
+          <aside className="tiles-area glass-panel rounded-2xl p-6 overflow-hidden slide-in-left">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-slate-200">Tile Selection</h2>
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-slate-400">Add to Hand</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={discardMode}
+                    onChange={() => setDiscardMode(!discardMode)}
+                  />
+                  <div className={`w-11 h-6 bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all ${discardMode ? 'bg-gradient-to-r from-purple-500 to-pink-500' : ''}`}></div>
+                </label>
+                <span className="text-sm text-slate-400">Discard</span>
+              </div>
+            </div>
+            
+            <div className="space-y-6 overflow-y-auto custom-scrollbar max-h-[calc(100vh-300px)]">
+              {Object.entries(tileTypes).map(([type, typeInfo]) => (
+                <div key={type} className="glass-card rounded-xl p-4">
+                  <div className="flex items-center mb-4">
+                    <span className="text-2xl mr-3">{typeInfo.emoji}</span>
+                    <h3 className="text-lg font-semibold text-slate-200">{typeInfo.name}</h3>
+                    <div className="ml-auto text-xs text-slate-400">
+                      {typeInfo.tiles.length} tiles
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-3">
+                    {typeInfo.tiles.map((value) => {
+                      const isMaxed = countTile(type, value) >= 4;
+                      const isHandFull = !discardMode && hand.length >= 14;
+                      const isDisabled = isMaxed || isHandFull;
+                      
+                      return (
+                        <button
+                          key={`${type}-${value}`}
+                          onClick={() => addToHand(type, value)}
+                          disabled={isDisabled}
+                          className={`tile-compact mahjong-tile rounded-lg text-white font-bold
+                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
+                            focus:outline-none focus:ring-2 focus:ring-white/30
+                            disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none
+                          `}
+                          style={{
+                            '--tile-bg-start': `var(--${type}-start)`,
+                            '--tile-bg-end': `var(--${type}-end)`
+                          }}
+                          title={`${value} of ${typeInfo.name}${isMaxed ? ' (Max 4)' : isHandFull ? ' (Hand Full)' : ''}`}
+                        >
+                          {type === 'man' && `${value}萬`}
+                          {type === 'pin' && `${value}筒`}
+                          {type === 'sou' && `${value}索`}
+                          {(type === 'wind' || type === 'dragon') && value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </aside>
+
+          {/* Main Game Area */}
+          <main className="game-area space-y-6 slide-in-right">
+            {/* Hand Section */}
+            <section className="glass-panel rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <h2 className="text-xl font-bold text-slate-200">Your Hand</h2>
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${shantenStatus.bg} ${shantenStatus.border} border`}>
+                    {shantenStatus.text}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={resetGame}
+                    className="btn-secondary text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300"
+                    title="Reset game (Ctrl+R)"
+                  >
+                    🔄 Reset
+                  </button>
+                  <button
+                    onClick={handleNewHandOrTile}
+                    className="btn-accent font-semibold px-4 py-2 rounded-lg transition-all duration-300"
+                    title={hand.length === 0 ? "Generate random hand (Ctrl+H)" : hand.length === 14 ? "Make AI discard (Ctrl+H)" : "Add random tile (Ctrl+H)"}
+                  >
+                    {hand.length === 0 ? '🎲 New Hand' : hand.length === 14 ? '🤖 AI Discard' : '➕ New Tile'}
+                  </button>
+                </div>
+              </div>
+              
+              <div className={`min-h-[120px] ${handAnimation}`}>
+                {hand.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-32 text-slate-400">
+                    <div className="text-4xl mb-3 opacity-50">🀄</div>
+                    <p className="text-lg">Select tiles to begin playing</p>
+                    <p className="text-sm mt-1">Click tiles on the left or generate a random hand</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    {hand.map((tile, idx) => {
+                      const typeInfo = tileTypes[tile.type];
+                      const isRecommended = recommendedDiscard?.index === idx;
+                      
+                      return (
+                        <button
+                          key={`${tile.type}-${tile.value}-${idx}`}
+                          onClick={() => removeFromHand(idx)}
+                          className={`tile-standard mahjong-tile rounded-lg text-white font-bold
+                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
+                            focus:outline-none transition-all duration-300
+                            ${isRecommended 
+                              ? "pulse-glow ring-2 ring-amber-400 scale-105 z-10" 
+                              : "focus:ring-2 focus:ring-white/30"
+                            }
+                          `}
+                          title={`Remove ${tileToString(tile)}${isRecommended ? ' (AI Recommended)' : ''}`}
+                        >
+                          {tile.type === 'man' && `${tile.value}萬`}
+                          {tile.type === 'pin' && `${tile.value}筒`}
+                          {tile.type === 'sou' && `${tile.value}索`}
+                          {(tile.type === 'wind' || tile.type === 'dragon') && tile.value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Discard Pile Section */}
+            <section className="glass-panel rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-200">Discard Pile</h2>
+                <div className="text-sm text-slate-400">
+                  {discardPile.length} tiles discarded
+                </div>
+              </div>
+              
+              <div className="min-h-[120px]">
+                {discardPile.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-32 text-slate-400">
+                    <div className="text-4xl mb-3 opacity-50">🗑️</div>
+                    <p className="text-lg">No discarded tiles yet</p>
+                    <p className="text-sm mt-1">Tiles you discard will appear here</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    {getSortedDiscardPile().map((tile, idx) => {
+                      const typeInfo = tileTypes[tile.type];
+                      
+                      return (
+                        <button
+                          key={`discard-${tile.type}-${tile.value}-${tile.originalIndex}`}
+                          onClick={() => removeFromDiscardPile(tile.originalIndex)}
+                          className={`tile-standard mahjong-tile rounded-lg text-white font-bold opacity-75
+                            bg-gradient-to-br ${typeInfo.color} ${typeInfo.shadow}
+                            focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300
+                            hover:opacity-100
+                          `}
+                          title={`Remove ${tileToString(tile)} from discard`}
+                        >
+                          {tile.type === 'man' && `${tile.value}萬`}
+                          {tile.type === 'pin' && `${tile.value}筒`}
+                          {tile.type === 'sou' && `${tile.value}索`}
+                          {(tile.type === 'wind' || tile.type === 'dragon') && tile.value}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+          </main>
+
+          {/* Stats and AI Panel */}
+          <aside className="stats-area glass-panel rounded-2xl p-6 overflow-hidden slide-in-right">
+            <h2 className="text-xl font-bold text-slate-200 mb-6">AI Analysis</h2>
+            
+            {/* AI Recommendation */}
+            {recommendedDiscard && (
+              <div className="glass-card rounded-xl p-4 mb-6 border-2 border-amber-400/30 bg-gradient-to-br from-amber-500/10 to-yellow-500/10">
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 bg-amber-400 rounded-full flex items-center justify-center text-amber-900 text-sm font-black mr-3">
+                    🤖
+                  </div>
+                  <h3 className="text-lg font-bold text-amber-400">Recommendation</h3>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-300">{handStatusText}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className={`tile-compact mahjong-tile rounded-lg text-white font-bold
+                        bg-gradient-to-br ${tileTypes[recommendedDiscard.tile.type].color}
+                      `}>
+                        {recommendedDiscard.tile.type === 'man' && `${recommendedDiscard.tile.value}萬`}
+                        {recommendedDiscard.tile.type === 'pin' && `${recommendedDiscard.tile.value}筒`}
+                        {recommendedDiscard.tile.type === 'sou' && `${recommendedDiscard.tile.value}索`}
+                        {(recommendedDiscard.tile.type === 'wind' || recommendedDiscard.tile.type === 'dragon') && recommendedDiscard.tile.value}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-sm text-slate-400">
+                    <strong className="text-amber-400">
+                      {countImprovingTilesAfterDiscard(hand, recommendedDiscard.index, shanten)}
+                    </strong> improving tiles available
+                  </div>
+                  
+                  <button
+                    onClick={handleAIDiscard}
+                    className="w-full btn-primary text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300"
+                  >
+                    Apply Recommendation
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Stats */}
+            <div className="space-y-4">
+              <div className="glass-card rounded-xl p-4">
+                <h3 className="text-lg font-semibold text-slate-200 mb-3">Game Statistics</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Hand Efficiency</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-red-500 to-green-500 transition-all duration-500"
+                          style={{ width: `${Math.max(0, (8 - Math.max(shanten, 0)) / 8 * 100)}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-slate-300">
+                        {Math.round(Math.max(0, (8 - Math.max(shanten, 0)) / 8 * 100))}%
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Tiles Remaining</span>
+                    <span className="text-slate-300">{136 - hand.length - discardPile.length}</span>
+                  </div>
+                  
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Unique Tiles</span>
+                    <span className="text-slate-300">
+                      {new Set(hand.map(tile => `${tile.type}-${tile.value}`)).size}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Keyboard Shortcuts */}
+              <div className="glass-card rounded-xl p-4">
+                <h3 className="text-lg font-semibold text-slate-200 mb-3">Shortcuts</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Reset Game</span>
+                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+R</code>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">New Hand/Tile</span>
+                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+H</code>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">AI Discard</span>
+                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Ctrl+D</code>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Close Modal</span>
+                    <code className="text-blue-400 bg-slate-800 px-2 py-1 rounded">Esc</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      );          {/* Enhanced Modal */}
+          {showModal && (
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6 z-50 fade-in-up"
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+            >
+              <div className="glass-panel rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden scale-in">
+                <div className="flex items-center justify-between p-6 border-b border-slate-700/50">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center text-xl">
+                      🀄
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-white">Mahjong AI Guide</h2>
+                      <p className="text-slate-400">Master the art of Mahjong strategy</p>
+                    </div>
+                  </div>
+                  <button
+                    className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors"
+                    onClick={() => setShowModal(false)}
+                    aria-label="Close dialog"
+                  >
+                    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto custom-scrollbar max-h-[calc(90vh-100px)]">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* What is Shanten */}
+                    <div className="glass-card rounded-2xl p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center mr-3">
+                          📊
+                        </div>
+                        <h3 className="text-xl font-bold text-blue-400">Understanding Shanten</h3>
+                      </div>
+                      <div className="space-y-3 text-slate-300 leading-relaxed">
+                        <p>
+                          The <strong className="text-blue-400">shanten number</strong> represents how many tiles away your hand is from being ready to win (tenpai).
+                        </p>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">-1</div>
+                            <span>Winning hand (ready to declare victory)</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold">0</div>
+                            <span>Tenpai (ready to win on next draw)</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold">1-3</div>
+                            <span>Close to winning</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 font-bold">4+</div>
+                            <span>Early stage, needs work</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* How AI Works */}
+                    <div className="glass-card rounded-2xl p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center mr-3">
+                          🤖
+                        </div>
+                        <h3 className="text-xl font-bold text-purple-400">AI Strategy Engine</h3>
+                      </div>
+                      <div className="space-y-3 text-slate-300 leading-relaxed">
+                        <p>
+                          Our AI analyzes every possible discard using advanced algorithms that consider:
+                        </p>
+                        <ul className="space-y-2">
+                          <li className="flex items-start space-x-2">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>All possible hand combinations and melds</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>Remaining tiles in the wall</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>Visible tiles in discard pile</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>Probability of drawing improving tiles</span>
+                          </li>
+                        </ul>
+                        <p className="text-sm text-slate-400 bg-slate-800/50 rounded-lg p-3">
+                          <strong>Pro Tip:</strong> The yellow highlighted tile in your hand shows the AI's recommendation. 
+                          It calculates the discard that gives you the best chance of improving your hand.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Tile Types */}
+                    <div className="glass-card rounded-2xl p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center mr-3">
+                          🀙
+                        </div>
+                        <h3 className="text-xl font-bold text-green-400">Tile Categories</h3>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold text-white mb-2">Number Suits (Simples)</h4>
+                          <div className="grid grid-cols-1 gap-2">
+                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+                              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded flex items-center justify-center text-white text-xs font-bold">1萬</div>
+                              <span className="text-slate-300">Characters (萬) - Red tiles</span>
+                            </div>
+                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+                              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded flex items-center justify-center text-white text-xs font-bold">1筒</div>
+                              <span className="text-slate-300">Dots (筒) - Orange tiles</span>
+                            </div>
+                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+                              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-700 rounded flex items-center justify-center text-white text-xs font-bold">1索</div>
+                              <span className="text-slate-300">Bamboo (索) - Green tiles</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold text-white mb-2">Honor Tiles</h4>
+                          <div className="grid grid-cols-1 gap-2">
+                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+                              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-700 rounded flex items-center justify-center text-white text-xs font-bold">東</div>
+                              <span className="text-slate-300">Winds (東南西北) - Purple tiles</span>
+                            </div>
+                            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+                              <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-700 rounded flex items-center justify-center text-white text-xs font-bold">中</div>
+                              <span className="text-slate-300">Dragons (中發白) - Blue tiles</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* How to Use */}
+                    <div className="glass-card rounded-2xl p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center mr-3">
+                          🎮
+                        </div>
+                        <h3 className="text-xl font-bold text-cyan-400">How to Play</h3>
+                      </div>
+                      <div className="space-y-3">
+                        <ol className="space-y-3">
+                          <li className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">1</div>
+                            <span className="text-slate-300">Click tiles on the left panel to add them to your hand (max 14 tiles)</span>
+                          </li>
+                          <li className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">2</div>
+                            <span className="text-slate-300">Watch the shanten number update in real-time as you build your hand</span>
+                          </li>
+                          <li className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">3</div>
+                            <span className="text-slate-300">Follow AI recommendations (highlighted tiles) for optimal play</span>
+                          </li>
+                          <li className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">4</div>
+                            <span className="text-slate-300">Click tiles in your hand to discard them</span>
+                          </li>
+                          <li className="flex items-start space-x-3">
+                            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-bold mt-0.5">5</div>
+                            <span className="text-slate-300">Use the toggle to switch between adding to hand or discard pile</span>
+                          </li>
+                        </ol>
+
+                        <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
+                          <h4 className="font-semibold text-amber-400 mb-2">Strategy Tips</h4>
+                          <ul className="text-sm text-slate-300 space-y-1">
+                            <li>• Always follow AI recommendations for optimal play</li>
+                            <li>• Keep versatile tiles that can form multiple combinations</li>
+                            <li>• Build sequences (123) rather than triplets when possible</li>
+                            <li>• Honor tiles are harder to use - consider discarding early</li>
+                            <li>• Pay attention to the improving tiles count</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Keyboard shortcuts at bottom */}
+                  <div className="mt-8 glass-card rounded-2xl p-6">
+                    <h3 className="text-xl font-bold text-white mb-4 flex items-center">
+                      <div className="w-10 h-10 rounded-lg bg-slate-500/20 flex items-center justify-center mr-3">
+                        ⌨️
+                      </div>
+                      Keyboard Shortcuts
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+R</code>
+                        <span className="text-sm text-slate-400">Reset Game</span>
+                      </div>
+                      <div className="text-center">
+                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+H</code>
+                        <span className="text-sm text-slate-400">New Hand/Tile</span>
+                      </div>
+                      <div className="text-center">
+                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Ctrl+D</code>
+                        <span className="text-sm text-slate-400">AI Discard</span>
+                      </div>
+                      <div className="text-center">
+                        <code className="text-blue-400 bg-slate-800 px-3 py-2 rounded-lg block mb-2">Esc</code>
+                        <span className="text-sm text-slate-400">Close Modal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
